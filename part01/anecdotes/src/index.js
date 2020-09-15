@@ -2,33 +2,46 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
 const Button = ({ name, clickHandler }) => {
-  return <button onClick={clickHandler}>{name}</button>
-}
+  return <button onClick={clickHandler}>{name}</button>;
+};
 
 const App = ({ anecdotes }) => {
   const [selected, setSelected] = useState(0);
 
+  // Set votes to array of 0s
+  // map function on anecdote will return an array of 0s of anecdotes's length
+  const [votes, setVotes] = useState(anecdotes.map((el) => 0));
+
   const getRandomNumber = () => {
     const maxLimit = anecdotes.length;
     return Math.floor(Math.random() * maxLimit);
-  }
+  };
 
   const getNextAnecdote = () => {
     let newAnecdoteIndex = getRandomNumber();
 
     // Check if the random index is already the selected one
-    // If so get a different index 
+    // If so get a different index
     while (newAnecdoteIndex === selected) {
       newAnecdoteIndex = getRandomNumber();
     }
-    
+
     setSelected(newAnecdoteIndex);
-  }
+  };
+
+  const handleVote = () => {
+    const copyOfVotes = [...votes];
+    copyOfVotes[selected] += 1;
+
+    setVotes(copyOfVotes);
+  };
 
   return (
     <div>
-      {anecdotes[selected]} <br></br>
-    <Button name="Next Anecdote" clickHandler={getNextAnecdote} />
+      <p>{anecdotes[selected]}</p>
+      <p>It has {votes[selected]} votes</p>
+      <Button name="Vote" clickHandler={handleVote} />
+      <Button name="Next Anecdote" clickHandler={getNextAnecdote} />
     </div>
   );
 };
