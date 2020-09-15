@@ -5,7 +5,7 @@ const ReviewButton = ({ name, clickHandler }) => (
   <button onClick={clickHandler}>{name}</button>
 );
 
-// I creatd the Statistics component separately form the begining 
+// I creatd the Statistics component separately form the begining
 const Statistics = ({ good, neutral, bad }) => {
   const score_for = {
     good: 1,
@@ -16,21 +16,19 @@ const Statistics = ({ good, neutral, bad }) => {
   const total = good + bad + neutral;
 
   const getAverage = () => {
-    if (total === 0) {
-      return 0;
-    } else {
-      // Since the score for neutral is 0, Its calculation can be omitted
-      return (good * score_for.good + bad * score_for.bad) / total;
-    }
+    // We can omit the check for divisible by 0
+    // As when no feedback is given, the code will never reach here
+    // Since the score for neutral is 0, Its calculation can be omitted
+    return (good * score_for.good + bad * score_for.bad) / total;
   };
 
   const getPositive = () => {
-    if (total === 0) {
-      return 0;
-    } else {
-      return good / total;
-    }
+    return good / total;
   };
+
+  if (total === 0) {
+    return <p>No feedbacks yet!!</p>;
+  }
 
   return (
     <div>
