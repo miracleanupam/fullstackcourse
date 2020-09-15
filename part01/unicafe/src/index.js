@@ -5,6 +5,7 @@ const ReviewButton = ({ name, clickHandler }) => (
   <button onClick={clickHandler}>{name}</button>
 );
 
+// I creatd the Statistics component separately form the begining 
 const Statistics = ({ good, neutral, bad }) => {
   const score_for = {
     good: 1,
