@@ -5,12 +5,22 @@ const Button = ({ name, clickHandler }) => {
   return <button onClick={clickHandler}>{name}</button>;
 };
 
+const Anecdote = ({ text, vote }) => {
+  return (
+    <div>
+      <p>{text}</p>
+      <p>It has {vote} votes</p>
+    </div>
+  );
+};
+
 const App = ({ anecdotes }) => {
   const [selected, setSelected] = useState(0);
 
   // Set votes to array of 0s
   // map function on anecdote will return an array of 0s of anecdotes's length
   const [votes, setVotes] = useState(anecdotes.map((el) => 0));
+  const [mostVoted, setMostVoted] = useState(0);
 
   const getRandomNumber = () => {
     const maxLimit = anecdotes.length;
@@ -33,15 +43,24 @@ const App = ({ anecdotes }) => {
     const copyOfVotes = [...votes];
     copyOfVotes[selected] += 1;
 
+    if (mostVoted !== selected) {
+      if (copyOfVotes[selected] > copyOfVotes[mostVoted]) {
+        setMostVoted(selected);
+      }
+    }
     setVotes(copyOfVotes);
   };
 
   return (
     <div>
-      <p>{anecdotes[selected]}</p>
-      <p>It has {votes[selected]} votes</p>
+      <h1>Anecdote of the day</h1>
+      <Anecdote text={anecdotes[selected]} vote={votes[selected]} />
+
       <Button name="Vote" clickHandler={handleVote} />
       <Button name="Next Anecdote" clickHandler={getNextAnecdote} />
+
+      <h1>Anecdote with most votes</h1>
+      <Anecdote text={anecdotes[mostVoted]} vote={votes[mostVoted]} />
     </div>
   );
 };
