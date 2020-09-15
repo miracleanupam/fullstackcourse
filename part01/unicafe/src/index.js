@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
+// I had extracted the button component from the beginning
 const ReviewButton = ({ name, clickHandler }) => (
   <button onClick={clickHandler}>{name}</button>
 );
 
-// I creatd the Statistics component separately form the begining
+const Stat = ({ name, value }) => (
+  <p>
+    {name}: {value}
+  </p>
+);
+
+// I creatd the Statistics component separately form the beginning
 const Statistics = ({ good, neutral, bad }) => {
   const score_for = {
     good: 1,
@@ -32,11 +39,11 @@ const Statistics = ({ good, neutral, bad }) => {
 
   return (
     <div>
-      <p>Good: {good}</p>
-      <p>Neutral: {neutral}</p>
-      <p>bad: {bad}</p>
-      <p>Average: {getAverage()}</p>
-      <p>Positive: {getPositive()} %</p>
+      <Stat name="Good" value={good} />
+      <Stat name="Neutral" value={neutral} />
+      <Stat name="Bad" value={bad} />
+      <Stat name="Average" value={getAverage()} />
+      <Stat name="Positive" value={getPositive()} />
     </div>
   );
 };
