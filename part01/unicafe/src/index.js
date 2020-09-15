@@ -7,9 +7,10 @@ const ReviewButton = ({ name, clickHandler }) => (
 );
 
 const Stat = ({ name, value }) => (
-  <p>
-    {name}: {value}
-  </p>
+  <tr>
+    <td>{name}</td>
+    <td>{value}</td>
+  </tr>
 );
 
 // I creatd the Statistics component separately form the beginning
@@ -38,13 +39,15 @@ const Statistics = ({ good, neutral, bad }) => {
   }
 
   return (
-    <div>
-      <Stat name="Good" value={good} />
-      <Stat name="Neutral" value={neutral} />
-      <Stat name="Bad" value={bad} />
-      <Stat name="Average" value={getAverage()} />
-      <Stat name="Positive" value={getPositive()} />
-    </div>
+    <table>
+      <tbody>
+        <Stat name="Good" value={good} />
+        <Stat name="Neutral" value={neutral} />
+        <Stat name="Bad" value={bad} />
+        <Stat name="Average" value={getAverage()} />
+        <Stat name="Positive" value={getPositive()} />
+      </tbody>
+    </table>
   );
 };
 
