@@ -32,11 +32,18 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    const newPerson = {
-      id: persons.length + 1,
-      name: newName,
-    };
-    setPersons(persons.concat(newPerson));
+    const already_exists = persons.filter(p => p.name === newName);
+
+    if (already_exists.length) {
+      // Its supposed to be backticks and not a quote for string formatting
+      window.alert(`'${newName}' is already added to phonebook`);
+    } else {
+      const newPerson = {
+        id: persons.length + 1,
+        name: newName,
+      };
+      setPersons(persons.concat(newPerson));
+    }
     setNewName("");
   };
 
