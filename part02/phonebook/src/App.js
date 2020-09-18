@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+
 
 const Filter = ({ search, handleSearchInput, handleSearch }) => {
   return (
@@ -50,12 +52,7 @@ const PersonDetails = ({ persons }) => {
 
 const App = () => {
   // this state is used to store the current/filtered details of phonebook
-  const [filteredPersons, setFilteredPersons] = useState([
-    { id: 1, name: "Arto Hellas", number: "040-123456" },
-    { id: 2, name: "Ada Lovelace", number: "39-44-5323523" },
-    { id: 3, name: "Dan Abramov", number: "12-43-234345" },
-    { id: 4, name: "Mary Poppendieck", number: "39-23-6423122" },
-  ]);
+  const [filteredPersons, setFilteredPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
@@ -63,6 +60,14 @@ const App = () => {
   // This state is used to store entire details of persons from phonebook
   const [allPersons, setAllPersons] = useState(filteredPersons);
 
+  useEffect(() => {
+    axios.get('http://localhost:3001/persons').then(
+      response => {
+        setFilteredPersons(response.data);
+        setAllPersons(response.data);
+      }
+    )
+  }, [])
 
   const addPerson = (event) => {
     event.preventDefault();
