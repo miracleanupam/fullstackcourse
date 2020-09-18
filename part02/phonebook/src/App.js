@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
-
+import axios from "axios";
 
 const Filter = ({ search, handleSearchInput, handleSearch }) => {
   return (
     <div>
-      <form onSubmit={handleSearch}>
-        Filter shown with <input value={search} onChange={handleSearchInput} />
-      </form>
+      Filter shown with <input value={search} onChange={handleSearchInput} />
     </div>
   );
 };
@@ -60,8 +57,10 @@ const App = () => {
   // This state is used to store entire details of persons from phonebook
   const [allPersons, setAllPersons] = useState(filteredPersons);
 
+  const DATA_ENDPOINT = "http://localhost:3001/persons";
+  
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(
+    axios.get(DATA_ENDPOINT).then(
       response => {
         setFilteredPersons(response.data);
         setAllPersons(response.data);
@@ -90,9 +89,10 @@ const App = () => {
       // allPersons so that the results get updated
       setFilteredPersons(allPersons.concat(newPerson));
       setAllPersons(allPersons.concat(newPerson));
+
+      setNewName("");
+      setNewNumber("");
     }
-    setNewName("");
-    setNewNumber("");
   };
 
   const handleNameInput = (event) => {
@@ -105,15 +105,15 @@ const App = () => {
 
   const handleSearchInput = (event) => {
     setSearch(event.target.value);
+    handleSearch(event.target.value);
   };
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    // To make the search case insensitive, each string is 
-    // converted to lowercase. string1.includes(string2) returns True 
+  const handleSearch = (term) => {
+    // To make the search case insensitive, each string is
+    // converted to lowercase. string1.includes(string2) returns True
     // when string2 is a substring of string1
     const filterResult = allPersons.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+      p.name.toLowerCase().includes(term.toLowerCase())
     );
     setFilteredPersons(filterResult);
   };
