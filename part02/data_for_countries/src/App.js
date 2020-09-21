@@ -1,11 +1,54 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const apiKey = process.env.REACT_APP_WEATHER_API;
+console.log("hello from gloabal", apiKey);
+
 // Component for getting serch term
 const Search = ({ value, handleSearchInput }) => {
   return (
     <div>
       find countries <input value={value} onChange={handleSearchInput} />
+    </div>
+  );
+};
+
+const WeatherData = ({ city }) => {
+  const [temp, setTemp] = useState("loading...");
+  const [wind, setWind] = useState("loading...");
+
+  const getWeatherData = () => {
+
+
+    // This part of code, work only half of the time
+    // It gives me an error that https_access_restricted
+    // But I dont' see where I have used https request
+    // The same get request works every time if I use 
+    // some other client for making the http request
+
+
+    axios
+      .get(
+        `http://api.weatherstack.com/current?access_key=${apiKey}&query=${city}&units=m`
+      )
+      .then((response) => {
+        // console.log(response);
+        console.log(response.data.current.temperature);
+        // console.log(
+        // response.data.current.wind_speed,
+        // "kph direction ",
+        // response.data.current.wind_dir
+        // );
+      });
+  };
+
+  useEffect(getWeatherData, []);
+
+  return (
+    <div>
+      <h3>Weather in {city}</h3>
+      <h4>temperature: {temp}</h4>
+      <h4>Wind: {wind}</h4>
     </div>
   );
 };
@@ -29,6 +72,7 @@ const CountryDetail = ({ data }) => {
         width="150"
         height="150"
       ></img>
+      <WeatherData city={data.capital} />
     </div>
   );
 };
@@ -47,7 +91,6 @@ const CountryList = ({ data, buttonHandler }) => {
     </div>
   );
 };
-
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,7 +137,7 @@ function App() {
   };
 
   const showSpecificCountryData = (name) => {
-    // Get the country name when the show button is clicked 
+    // Get the country name when the show button is clicked
     // Behind the scenes, just person the person with the name which is only get one result
     // Except for the corner cases like Sudan
     performSearch(name);
