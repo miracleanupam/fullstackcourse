@@ -20,7 +20,7 @@ const CountryDetail = ({ data }) => {
       <h3>Languages</h3>
       <ul>
         {data.languages.map((lang) => (
-          <ListItem key={lang.name} name={lang.name} />
+          <li key={lang.name}>{lang.name}</li>
         ))}
       </ul>
       <img
@@ -33,41 +33,21 @@ const CountryDetail = ({ data }) => {
   );
 };
 
-const ListItem = ({ name }) => {
-  return <li>{name}</li>;
-};
-
-const DisplayDetails = ({ showResults, tooManyMatch, searchResults }) => {
-  // Looks confusing but here is the summary
-  // showResult ? Logic for showing results : Don't so anything
-  // Logic for showing results:
-  // tooManyResults ? Display the respective message : Logic for showing detail or list
-  // Logic for showing detail or list:
-  // serachResults.length === 1: show details ? show list
+const CountryList = ({ data, buttonHandler }) => {
   return (
     <div>
-      {showResults ? (
-        tooManyMatch ? (
-          <p>Too many matches, specify another filter</p>
-        ) : searchResults.length === 1 ? (
-          <div>
-            <CountryDetail data={searchResults[0]} />
-          </div>
-        ) : (
-          <div>
-            <ul>
-              {searchResults.map((c) => (
-                <ListItem key={c.name} name={c.name} />
-              ))}
-            </ul>
-          </div>
-        )
-      ) : (
-        <div></div>
-      )}
+      <ul>
+        {data.map((c) => (
+          <li key={c.name}>
+            {c.name}
+            <button onClick={() => buttonHandler(c.name)}>show</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
+
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,7 +83,7 @@ function App() {
     // I feel like this was not needed but there's no harm in storing this info
     // Also, there might be advantages of controlling the value of search input from here
     setSearchTerm(event.target.value);
-    
+
     if (event.target.value === "") {
       //If the search term is empty, turn of result section
       setShowResults(false);
@@ -113,14 +93,37 @@ function App() {
     }
   };
 
+  const showSpecificCountryData = (name) => {
+    // Get the country name when the show button is clicked 
+    // Behind the scenes, just person the person with the name which is only get one result
+    // Except for the corner cases like Sudan
+    performSearch(name);
+  };
+
+  // Looks confusing but here is the summary
+  // showResult ? Logic for showing results : Don't so anything
+  // Logic for showing results:
+  // tooManyResults ? Display the respective message : Logic for showing detail or list
+  // Logic for showing detail or list:
+  // serachResults.length === 1: show details ? show list
   return (
     <div>
       <Search value={searchTerm} handleSearchInput={handleSearchInput} />
-      <DisplayDetails
-        showResults={showResults}
-        tooManyMatch={tooManyMatch}
-        searchResults={searchResults}
-      />
+
+      {showResults ? (
+        tooManyMatch ? (
+          <p>Too many matches, specify another filter</p>
+        ) : searchResults.length === 1 ? (
+          <CountryDetail data={searchResults[0]} />
+        ) : (
+          <CountryList
+            data={searchResults}
+            buttonHandler={showSpecificCountryData}
+          />
+        )
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 }
