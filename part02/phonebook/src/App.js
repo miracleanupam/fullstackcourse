@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import PersonServices from './services/persons';
+
 
 const Filter = ({ search, handleSearchInput, handleSearch }) => {
   return (
@@ -55,16 +56,12 @@ const App = () => {
 
   // This state is used to store entire details of persons from phonebook
   const [allPersons, setAllPersons] = useState(filteredPersons);
-
-  const DATA_ENDPOINT = "http://localhost:3001/persons";
   
   useEffect(() => {
-    axios.get(DATA_ENDPOINT).then(
-      response => {
-        setFilteredPersons(response.data);
-        setAllPersons(response.data);
-      }
-    )
+    PersonServices.getAll().then(initialPersons => {
+        setFilteredPersons(initialPersons);
+        setAllPersons(initialPersons);      
+    })
   }, [])
 
   const addPerson = (event) => {
@@ -83,17 +80,15 @@ const App = () => {
         number: newNumber,
       };
 
-      axios.post('http://localhost:3001/persons', newPerson)
-        .then(response => {
-          // When adding a new phoneboo contact, update both filteredPersons and
-          // allPersons so that the results get updated
-          setFilteredPersons(allPersons.concat(response.data));
-          setAllPersons(allPersons.concat(response.data));
+      PersonServices.create(newPerson).then(personFromServer => {
+        // When adding a new phoneboo contact, update both filteredPersons and
+        // allPersons so that the results get updated
+        setFilteredPersons(allPersons.concat(personFromServer));
+        setAllPersons(allPersons.concat(personFromServer));
 
-          setNewName("");
-          setNewNumber("");
-        })
-
+        setNewName("");
+        setNewNumber("");
+      })
     }
   };
 
