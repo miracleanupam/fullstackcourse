@@ -79,7 +79,6 @@ const App = () => {
         // Since state variable filteredPersons is used to store the filtered results
         // It should not be used when adding a new phonebook contact
         // allPersons should be used
-        // id: allPersons.length + 1,
         name: newName,
         number: newNumber,
       };
