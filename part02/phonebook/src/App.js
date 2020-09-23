@@ -69,11 +69,36 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    const already_exists = filteredPersons.filter((p) => p.name === newName);
+    const already_exists = allPersons.filter((p) => p.name === newName);
 
     if (already_exists.length) {
       // Its supposed to be backticks and not a quote for string formatting
-      window.alert(`'${newName}' is already added to phonebook`);
+      // window.alert(`'${newName}' is already added to phonebook`);
+
+      const oldPerson = already_exists[0];
+      const resp = window.confirm(
+        `${newName} is already added to Phonebook. Replace old number?`
+      );
+
+      if (resp === true) {
+        PersonServices.update(oldPerson.id, {
+          ...oldPerson,
+          number: newNumber,
+        })
+          .then((changedPerson) => {
+            setFilteredPersons(
+              filteredPersons.map((p) =>
+                p.id !== oldPerson.id ? p : changedPerson
+              )
+            );
+            setAllPersons(
+              allPersons.map((p) => (p.id !== oldPerson.id ? p : changedPerson))
+            );
+          })
+          .catch((err) => console.log(err));
+      } else {
+        console.log("Opted not to update");
+      }
     } else {
       const newPerson = {
         // Since state variable filteredPersons is used to store the filtered results
