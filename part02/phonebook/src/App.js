@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PersonServices from './services/persons';
-
+import PersonServices from "./services/persons";
 
 const Filter = ({ search, handleSearchInput, handleSearch }) => {
   return (
@@ -33,16 +32,16 @@ const AddPersonForm = ({
   );
 };
 
-const PersonDetails = ({ persons }) => {
-  console.log(persons);
+const PersonDetails = ({ persons, handleRemove }) => {
   return (
     <div>
       <h2>Numbers</h2>
-        {persons.map((person) => (
-          <li key={person.id}>
-            {person.name} {person.number}
-          </li>
-        ))}
+      {persons.map((person) => (
+        <li key={person.id}>
+          {person.name} {person.number}{" "}
+          <button onClick={() => handleRemove(person.id)}>Delete</button>
+        </li>
+      ))}
     </div>
   );
 };
@@ -56,13 +55,17 @@ const App = () => {
 
   // This state is used to store entire details of persons from phonebook
   const [allPersons, setAllPersons] = useState(filteredPersons);
-  
+
   useEffect(() => {
-    PersonServices.getAll().then(initialPersons => {
+    PersonServices.getAll()
+      .then((initialPersons) => {
         setFilteredPersons(initialPersons);
-        setAllPersons(initialPersons);      
-    })
-  }, [])
+        setAllPersons(initialPersons);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -80,15 +83,40 @@ const App = () => {
         number: newNumber,
       };
 
-      PersonServices.create(newPerson).then(personFromServer => {
-        // When adding a new phoneboo contact, update both filteredPersons and
-        // allPersons so that the results get updated
-        setFilteredPersons(allPersons.concat(personFromServer));
-        setAllPersons(allPersons.concat(personFromServer));
+      PersonServices.create(newPerson)
+        .then((personFromServer) => {
+          // When adding a new phoneboo contact, update both filteredPersons and
+          // allPersons so that the results get updated
+          if (
+            personFromServer.name.toLowerCase().includes(search.toLowerCase())
+          ) {
+            setFilteredPersons(filteredPersons.concat(personFromServer));
+          }
+          setAllPersons(allPersons.concat(personFromServer));
 
-        setNewName("");
-        setNewNumber("");
-      })
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  const handleRemove = (id) => {
+    const resp = window.confirm(
+      `Delete ${allPersons.filter((p) => p.id === id)[0].name}`
+    );
+
+    if (resp === true) {
+      PersonServices.remove(id)
+        .then((res) => {
+          setFilteredPersons(filteredPersons.filter((p) => p.id !== id));
+          setAllPersons(allPersons.filter((p) => p.id !== id));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("Opted not to delete");
     }
   };
 
@@ -131,7 +159,7 @@ const App = () => {
         handleNumberInput={handleNumberInput}
         addPerson={addPerson}
       />
-      <PersonDetails persons={filteredPersons} />
+      <PersonDetails persons={filteredPersons} handleRemove={handleRemove} />
     </div>
   );
 };
