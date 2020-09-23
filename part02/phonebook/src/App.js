@@ -33,16 +33,15 @@ const AddPersonForm = ({
 };
 
 const PersonDetails = ({ persons }) => {
+  console.log(persons);
   return (
     <div>
       <h2>Numbers</h2>
-      <ul>
         {persons.map((person) => (
           <li key={person.id}>
             {person.name} {person.number}
           </li>
         ))}
-      </ul>
     </div>
   );
 };
@@ -80,18 +79,22 @@ const App = () => {
         // Since state variable filteredPersons is used to store the filtered results
         // It should not be used when adding a new phonebook contact
         // allPersons should be used
-        id: allPersons.length + 1,
+        // id: allPersons.length + 1,
         name: newName,
         number: newNumber,
       };
 
-      // When adding a new phoneboo contact, update both filteredPersons and
-      // allPersons so that the results get updated
-      setFilteredPersons(allPersons.concat(newPerson));
-      setAllPersons(allPersons.concat(newPerson));
+      axios.post('http://localhost:3001/persons', newPerson)
+        .then(response => {
+          // When adding a new phoneboo contact, update both filteredPersons and
+          // allPersons so that the results get updated
+          setFilteredPersons(allPersons.concat(response.data));
+          setAllPersons(allPersons.concat(response.data));
 
-      setNewName("");
-      setNewNumber("");
+          setNewName("");
+          setNewNumber("");
+        })
+
     }
   };
 
