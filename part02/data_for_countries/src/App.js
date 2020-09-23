@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const apiKey = process.env.REACT_APP_WEATHER_API;
-console.log("hello from gloabal", apiKey);
+// Since I'm using my own API for for weather data, commenting this
+// const apiKey = process.env.REACT_APP_WEATHER_API;
 
 // Component for getting serch term
 const Search = ({ value, handleSearchInput }) => {
@@ -13,41 +13,37 @@ const Search = ({ value, handleSearchInput }) => {
   );
 };
 
+// Using weather stack directly only worked half of the time, might be problems with either my
+// Implementation, or axios/fetch or weather stack api backend. I don't know which one
+// So, I hosted my own API, which queried from weatherstack and gave the response to this app
+// So, I still have used the weather stack api but I've put a intermediary now
 const WeatherData = ({ city }) => {
   const [temp, setTemp] = useState("loading...");
   const [wind, setWind] = useState("loading...");
+  const [imges, setImges] = useState([]);
 
-  const getWeatherData = () => {
-
-
-    // This part of code, work only half of the time
-    // It gives me an error that https_access_restricted
-    // But I dont' see where I have used https request
-    // The same get request works every time if I use 
-    // some other client for making the http request
-
-
-    axios
-      .get(
-        `http://api.weatherstack.com/current?access_key=${apiKey}&query=${city}&units=m`
-      )
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: 'https://angrezi.herokuapp.com/api/v1/weather',
+      params: {
+        city: city
+      },
+    })
       .then((response) => {
-        // console.log(response);
-        console.log(response.data.current.temperature);
-        // console.log(
-        // response.data.current.wind_speed,
-        // "kph direction ",
-        // response.data.current.wind_dir
-        // );
+        setTemp(response.data.current.temperature);
+        setWind(
+          `${response.data.current.wind_speed} kph direction ${response.data.current.wind_dir}`
+        );
+        setImges(response.data.current.weather_icons);
       });
-  };
-
-  useEffect(getWeatherData, []);
+  }, [city])
 
   return (
     <div>
       <h3>Weather in {city}</h3>
-      <h4>temperature: {temp}</h4>
+      <h4>temperature: {temp} Celcius</h4>
+      {imges.map((im, idx) => <img key={idx} src={im} alt="" />)}
       <h4>Wind: {wind}</h4>
     </div>
   );
@@ -72,7 +68,6 @@ const CountryDetail = ({ data }) => {
         width="150"
         height="150"
       ></img>
-      <WeatherData city={data.capital} />
     </div>
   );
 };
@@ -98,6 +93,7 @@ function App() {
   const [tooManyMatch, setTooManyMatch] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [capital, setCapital] = useState(['']);
 
   const COUNTRIES_DATA_ENDPOINT = "https://restcountries.eu/rest/v2/all";
 
@@ -119,6 +115,9 @@ function App() {
     }
     setSearchResults(filteredResult);
     setShowResults(true);
+    if (filteredResult.length === 1) {
+      setCapital(filteredResult[0].capital);
+    }
   };
 
   const handleSearchInput = (event) => {
@@ -157,7 +156,10 @@ function App() {
         tooManyMatch ? (
           <p>Too many matches, specify another filter</p>
         ) : searchResults.length === 1 ? (
-          <CountryDetail data={searchResults[0]} />
+          <div>  
+            <CountryDetail data={searchResults[0]} />
+            <WeatherData city={capital} />
+          </div>
         ) : (
           <CountryList
             data={searchResults}
