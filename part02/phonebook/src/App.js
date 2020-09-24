@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PersonServices from "./services/persons";
+import "./App.css";
 
 const Filter = ({ search, handleSearchInput, handleSearch }) => {
   return (
@@ -46,6 +47,20 @@ const PersonDetails = ({ persons, handleRemove }) => {
   );
 };
 
+const Message = ({ msg }) => {
+  return (
+    <div>
+      {msg.text !== "" ? (
+        <div className={msg.isError === true ? "error" : "success"}>
+          <h2>{msg.text}</h2>
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
+  );
+};
+
 const App = () => {
   // this state is used to store the current/filtered details of phonebook
   const [filteredPersons, setFilteredPersons] = useState([]);
@@ -56,6 +71,9 @@ const App = () => {
   // This state is used to store entire details of persons from phonebook
   const [allPersons, setAllPersons] = useState(filteredPersons);
 
+  // State to store messages
+  const [msg, setMsg] = useState({ text: "", isError: false });
+
   useEffect(() => {
     PersonServices.getAll()
       .then((initialPersons) => {
@@ -63,7 +81,10 @@ const App = () => {
         setAllPersons(initialPersons);
       })
       .catch((err) => {
-        console.log(err);
+        setNewMesg({
+          text: "some error occured",
+          isError: true,
+        });
       });
   }, []);
 
@@ -94,8 +115,17 @@ const App = () => {
             setAllPersons(
               allPersons.map((p) => (p.id !== oldPerson.id ? p : changedPerson))
             );
+            setNewMesg({
+              text: "Successfully updated",
+              isError: false,
+            });
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            setNewMesg({
+              text: `${oldPerson.name} could not be updated`,
+              isError: true,
+            });
+          });
       } else {
         console.log("Opted not to update");
       }
@@ -118,27 +148,52 @@ const App = () => {
             setFilteredPersons(filteredPersons.concat(personFromServer));
           }
           setAllPersons(allPersons.concat(personFromServer));
-
+          setNewMesg({
+            text: "Successfully added",
+            isError: false,
+          });
           setNewName("");
           setNewNumber("");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          setNewMesg({
+            text: `${newName} could not be added`,
+            isError: true,
+          });
+        });
     }
   };
 
+  const setNewMesg = (newMessage) => {
+    setMsg(newMessage);
+
+    setTimeout(() => {
+      setMsg({
+        text: "",
+        isError: false,
+      });
+    }, 5000);
+  };
+
   const handleRemove = (id) => {
-    const resp = window.confirm(
-      `Delete ${allPersons.filter((p) => p.id === id)[0].name}`
-    );
+    const nameToDel = allPersons.filter((p) => p.id === id)[0].name;
+    const resp = window.confirm(`Delete ${nameToDel}`);
 
     if (resp === true) {
       PersonServices.remove(id)
         .then((res) => {
           setFilteredPersons(filteredPersons.filter((p) => p.id !== id));
           setAllPersons(allPersons.filter((p) => p.id !== id));
+          setNewMesg({
+            text: "Successfully deleted",
+            isError: false,
+          });
         })
         .catch((err) => {
-          console.log(err);
+          setNewMesg({
+            text: `Information of ${nameToDel} has already been removed from server`,
+            isError: true,
+          });
         });
     } else {
       console.log("Opted not to delete");
@@ -171,6 +226,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message msg={msg} />
       <Filter
         search={search}
         handleSearchInput={handleSearchInput}
