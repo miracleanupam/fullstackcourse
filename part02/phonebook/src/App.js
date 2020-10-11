@@ -122,7 +122,7 @@ const App = () => {
           })
           .catch((err) => {
             setNewMesg({
-              text: `${oldPerson.name} could not be updated`,
+              text: err.response.data.msg,
               isError: true,
             });
           });
@@ -157,7 +157,7 @@ const App = () => {
         })
         .catch((err) => {
           setNewMesg({
-            text: `${newName} could not be added`,
+            text: err.response.data.msg,
             isError: true,
           });
         });
